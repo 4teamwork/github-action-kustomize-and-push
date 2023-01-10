@@ -23,10 +23,10 @@ COMMIT_MESSAGE="${COMMIT_MESSAGE/KUSTOMIZE_IMAGES/$KUSTOMIZE_IMAGES}"
 # Make sure we have a version:
 if [ -z $KUSTOMIZE_VERSION ]; then
     echo "[+] Downloding Kustomize latest version"
-    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+    curl -H "Authorization: Bearer $API_TOKEN_GITHUB" -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
 else
     echo "[+] Downloding Kustomize $KUSTOMIZE_VERSION version"
-    curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh $KUSTOMIZE_VERSION"  | bash
+    curl -H "Authorization: Bearer $API_TOKEN_GITHUB" -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh $KUSTOMIZE_VERSION"  | bash
 fi
 
 if [ -z "$USER_NAME" ]; then
