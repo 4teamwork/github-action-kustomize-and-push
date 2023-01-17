@@ -81,6 +81,23 @@ echo "[+] git diff-index:"
 # git diff-index : to avoid doing the git commit failing if there are no changes to be commit
 git diff-index --quiet HEAD || git commit --message "$COMMIT_MESSAGE"
 
-echo "[+] Pushing git commit"
-# --set-upstream: sets de branch when pushing to a branch that does not exist
-git push "https://$USER_NAME:$API_TOKEN_GITHUB@$GITHUB_SERVER/$REPOSITORY_USERNAME/$REPOSITORY_NAME.git" --set-upstream "$TARGET_BRANCH"
+# When pushing the commit, git conflicts can occur when already another change
+# was pushed by another pipeline at the same time.
+# In this case, we try to rebase onto the upstream and try again.
+for retry in {0..4}; do
+    if [[ $exitcode -ne 0 ]]; then
+        echo "[+] Rebasing onto upstream:"
+        git pull --rebase
+    fi
+
+    exitcode=0
+    echo "[+] Pushing git commit"
+    # --set-upstream: sets the branch when pushing to a branch that does not exist
+    git push "https://$USER_NAME:$API_TOKEN_GITHUB@$GITHUB_SERVER/$REPOSITORY_USERNAME/$REPOSITORY_NAME.git" --set-upstream "$TARGET_BRANCH" || exitcode=$?
+    if [[ $exitcode -eq 0 ]]; then
+        break
+    fi
+
+    echo "[!] git push failed"
+done
+exit $exitcode
