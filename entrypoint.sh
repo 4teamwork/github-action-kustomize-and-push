@@ -84,6 +84,7 @@ git diff-index --quiet HEAD || git commit --message "$COMMIT_MESSAGE"
 # When pushing the commit, git conflicts can occur when already another change
 # was pushed by another pipeline at the same time.
 # In this case, we try to rebase onto the upstream and try again.
+exitcode=0
 for retry in {0..4}; do
     if [[ $exitcode -ne 0 ]]; then
         echo "[+] Rebasing onto upstream:"
